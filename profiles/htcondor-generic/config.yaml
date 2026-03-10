@@ -2,7 +2,7 @@ jobscript: "condor-jobscript.sh"
 executor: htcondor
 htcondor-jobdir: logs
 shared-fs-usage: none
-default-storage-provider: fs # use the local file system
+# default-storage-provider: fs # use the local file system
 default-resources:
   classad_MaxRuntimeHours: 4
   threads: 1

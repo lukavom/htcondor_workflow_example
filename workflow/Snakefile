@@ -28,6 +28,18 @@ rule write_access_submit_fs:
         """
 
 
+rule submit_write_access_shared_fs:
+    output:
+        f'{config["PATH_SHARED_FS_OUTPUT"]}/write_sharedfs.done',
+    shell:
+        """
+        echo "{output}"
+        mkdir -p $(dirname {output})
+        touch {output}
+        echo "write to test" > {output}
+        """
+
+
 rule write_access_shared_fs:
     localrule: True
     output:
