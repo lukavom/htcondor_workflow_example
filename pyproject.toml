@@ -1,0 +1,18 @@
+[project]
+name = "example-workflow"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "snakemake>9",
+    "snakemake-executor-plugin-htcondor",
+]
+
+[tool.uv.workspace]
+members = [
+    "snakemake-executor-plugin-htcondor",
+]
+
+[tool.uv.sources]
+snakemake-executor-plugin-htcondor = { workspace = true, editable = true }

@@ -1,0 +1,6 @@
+PATH_SHARED_FS: "/cephfs/user/${USER}"
+PATH_SUBMIT_FS: "/home/${USER}/physik"
+
+
+PATH_SHARED_FS_OUTPUT: "/cephfs/user/${USER}/snakemake_test_output"
+PATH_SUBMIT_FS_OUTPUT: "/home/${USER}/physik/snakemake_test_output"

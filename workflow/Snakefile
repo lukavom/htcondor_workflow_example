@@ -1,0 +1,179 @@
+# Load config file
+configfile: "workflow/config.yaml"
+
+
+fs_shared = config["PATH_SHARED_FS"]
+import os
+
+# expand environment variables like ${USER} in config values
+for k, v in list(config.items()):
+    if isinstance(v, str):
+        config[k] = os.path.expandvars(v)
+
+
+# Include software setup rules
+include: "software/helloworld.smk"
+
+
+rule write_access_submit_fs:
+    localrule: True
+    output:
+        f'{config["PATH_SUBMIT_FS_OUTPUT"]}/write_submitfs.done',
+    shell:
+        """
+        echo "{output}"
+        mkdir -p $(dirname {output})
+        touch {output}
+        echo "write to test" > {output}
+        """
+
+
+rule write_access_shared_fs:
+    localrule: True
+    output:
+        f'{config["PATH_SHARED_FS_OUTPUT"]}/read_sharedfs.done',
+    shell:
+        """
+        ls {config[PATH_SHARED_FS]} > /dev/null
+        echo "read access test" >> {output}
+        """
+
+
+rule test_path_parsing:
+    # showcase and test different ways to parse env variables in paths, see function at top of file
+    # tests interaction with string templating, such as f-strings, which can be tricky
+    localrule: True
+    output:
+        f'{config["PATH_SUBMIT_FS_OUTPUT"]}/hello.txt',
+    shell:
+        """
+        echo {config[PATH_SHARED_FS]} >> {output}
+        echo {config[PATH_SUBMIT_FS]} >> {output}
+        echo /cephfs/user/${{USER}}/snakemake_tests >> {output}
+        """
+
+
+rule copy_inputs_to_sharedfs:
+    localrule: True
+    input:
+        f"{workflow.workdir_init}/inputs/input.txt",
+    output:
+        f'{config["PATH_SHARED_FS_OUTPUT"]}/inputs/input.txt',
+    shell:
+        """
+        mkdir -p {config[PATH_SHARED_FS_OUTPUT]}/inputs
+        cp {input} {output}
+        """
+
+
+rule run_software:
+    input:
+        SOFT=rules.compile_software.output,
+        RUNT=rules.copy_setup_script_to_sharedfs.output,
+        INPUT=rules.copy_inputs_to_sharedfs.output,
+    output:
+        f'{config["PATH_SHARED_FS_OUTPUT"]}/out.txt',
+    params:
+        a=1,
+    shell:
+        """
+        . {input.RUNT} {input.SOFT}
+        mkdir run
+        cd run
+        main
+        cp {input.INPUT} .
+        cat output.txt >> input.txt
+        mkdir -p $(dirname {output[0]})
+        mv input.txt {output[0]}
+        cd ..
+        rm -r run
+        """
+
+
+# series of tests for ATLAS software setup
+# to run a series of commands in the atlas environment use --runpayload=
+rule setupATLAS_local:
+    localrule: True
+    output:
+        f'{config["PATH_SUBMIT_FS"]}/setupATLAS_local.text',
+    shell:
+        """
+        set +eu
+        setupATLAS -c el9 --runpayload="
+        lsetup 'root 6.36.02-x86_64-el9-gcc14-opt';
+        root --version > {output};
+        "
+        """
+
+
+# same but submit job
+# currently fails when submitted
+rule setupATLAS_batch:
+    output:
+        f'{config["PATH_SUBMIT_FS_OUTPUT"]}/setupATLAS_batch.text',
+    resources:
+        classad_ContainerOS="Rocky9",
+        classad_CephFS_IO="high",
+        classad_MaxRuntimeHours=1,
+    shell:
+        """
+        set +eu
+        ls {config[PATH_SHARED_FS]};
+        setupATLAS -c el9 --runpayload="
+            lsetup 'root 6.36.02-x86_64-el9-gcc14-opt';
+            pwd;
+            ls;
+            root --version > {output};
+            ls {config[PATH_SHARED_FS]} >> {output};
+        "
+        """
+
+
+# rule that uses local software that runs in setupATLAS needs to read files from shared filesystem
+# e.g. have a plotting code that imports root and plots a file from a collegues shared system
+# essentially need to add "-m "
+rule setupATLAS_foreign_files:
+    localrule: True
+    input:
+        f'{config["PATH_SHARED_FS_OUTPUT"]}/read_sharedfs.done',
+    output:
+        f'{config["PATH_SHARED_FS_OUTPUT"]}/setupATLAS_foreign_files.text',
+    shell:
+        """
+        set +eu
+        setupATLAS -c el9 -m {config[PATH_SHARED_FS_OUTPUT]} --runpayload="
+        pwd;
+        ls;
+        echo doing;
+        cat {input} >> {output};
+        "
+        """
+
+
+# rule to check that the tarballing of files from the submit system into the workernode runs
+rule test_input_tarball_to_workernode:
+    input:
+        "custom_software/Makefile",
+        "custom_software/main.cpp",
+    output:
+        f'{config["PATH_SHARED_FS_OUTPUT"]}/output.txt',
+    shell:
+        """
+        cd custom_software/
+        make
+        ./main
+        cp output.txt {output}
+        ls
+        """
+
+
+rule all:
+    default_target: True
+    input:
+        rules.write_access_submit_fs.output,
+        rules.write_access_shared_fs.output,
+        rules.test_path_parsing.output,
+        rules.run_software.output,
+        rules.setupATLAS_local.output,
+        rules.setupATLAS_batch.output,
+        rules.test_input_tarball_to_workernode.output,
