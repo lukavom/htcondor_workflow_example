@@ -15,4 +15,4 @@ members = [
 ]
 
 [tool.uv.sources]
-snakemake-executor-plugin-htcondor = { workspace = true, editable = true }
+snakemake-executor-plugin-htcondor = { workspace = true }
