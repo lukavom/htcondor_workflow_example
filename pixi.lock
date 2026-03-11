@@ -709,7 +709,7 @@ packages:
   requires_python: '>=3.7'
 - pypi: ./src/snakemake
   name: snakemake
-  version: 9.16.3
+  version: 0.1.dev5773
   sha256: 7919d35e19c44179135d766cde24bd6e06c2f5826a4171fc61759d0395fee3b0
   requires_dist:
   - appdirs
