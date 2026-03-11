@@ -6,13 +6,16 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "snakemake>9",
+    "snakemake-interface-executor-plugins",
     "snakemake-executor-plugin-htcondor",
 ]
 
-[tool.uv.workspace]
-members = [
-    "snakemake-executor-plugin-htcondor",
-]
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
 
-[tool.uv.sources]
-snakemake-executor-plugin-htcondor = { workspace = true }
+[tool.pixi.pypi-dependencies]
+example-workflow = { path = ".", editable = true }
+snakemake = { path = "./snakemake", editable = true }
+snakemake-interface-executor-plugins = { path = "./snakemake-interface-executor-plugins", editable = true }
+snakemake-executor-plugin-htcondor = { path = "./snakemake-executor-plugin-htcondor", editable = true }
