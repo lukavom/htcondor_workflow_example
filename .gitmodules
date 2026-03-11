@@ -1,3 +1,6 @@
-[submodule "snakemake-executor-plugin-htcondor"]
-	path = snakemake-executor-plugin-htcondor
-	url = https://github.com/lukavom/snakemake-executor-plugin-htcondor.git
+[submodule "snakemake-interface-executor-plugins"]
+	path = snakemake-interface-executor-plugins
+	url = git@github.com:lukavom/snakemake-interface-executor-plugins.git
+[submodule "snakemake"]
+	path = snakemake
+	url = git@github.com:lukavom/snakemake.git
