@@ -22,5 +22,5 @@ keep-going: True
 printshellcmds: True
 keep-incomplete: True
 rerun-incomplete: True
-rerun-triggers: { mtime, params, code }
+rerun-triggers: {mtime: '', params: '', code: ''}
 retries: 0 # restart fallible rules this many times. Sometimes jobs fail because the file system has a small hiccup at the wrong time.
