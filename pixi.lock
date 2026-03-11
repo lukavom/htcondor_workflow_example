@@ -709,8 +709,8 @@ packages:
   requires_python: '>=3.7'
 - pypi: ./src/snakemake
   name: snakemake
-  version: 0.1.dev5783
-  sha256: b15f2400345f2ca787be0f250719dc154699638b0e32cfa8e968419418f4ce1c
+  version: 9.16.3
+  sha256: 7919d35e19c44179135d766cde24bd6e06c2f5826a4171fc61759d0395fee3b0
   requires_dist:
   - appdirs
   - immutables
@@ -770,7 +770,7 @@ packages:
 - pypi: ./src/snakemake-interface-executor-plugins
   name: snakemake-interface-executor-plugins
   version: 9.4.0
-  sha256: d66e0cd9eb9d727aef02fc7cf4a8aaf1b76ef5a779bdf37c92bddfd5797b7b8f
+  sha256: cc5fc016b37d4b6c66e22017ffe59ec3b5758b0fbb3ac2785c722d2aed75b511
   requires_dist:
   - snakemake-interface-common>=1.19.0
   - throttler>=1.2.2
