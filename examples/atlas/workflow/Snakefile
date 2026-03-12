@@ -9,16 +9,16 @@ submit_results = os.path.expandvars(config["submit_results"])
 
 rule filter_str:
     input:
-        storage.xrootd(config["input_data"]),
+        config["input_data"],
     output:
         "ntuple0_str_output.root",
     log:
         "logs/filter/filter_str.log",
     params:
-        input_tree_name="TestTree",
-        output_tree_name="TestTree",
-        criteria="(pt > 1400) && (pz > 19000)",
-        branches_to_save=["pz", "pt", "p"],
+        input_tree_name="analysis",
+        output_tree_name="analysis",
+        criteria="(met >100)",
+        branches_to_save=["met", "tau_pt"],
     threads: 2
     wrapper:
         "v9.3.0/phys/root/filter"
