@@ -1,3 +1,5 @@
+input_data: "root://eospublic.cern.ch//eos/opendata/atlas/rucio/mc20_13TeV/DAOD_PHYSLITE.38191206._000001.pool.root.1"
+
 local_inputs: "inputs"
 local_results: "results"
 submit_inputs: "/cephfs/user/${USER}/snakemake_test_inputs"

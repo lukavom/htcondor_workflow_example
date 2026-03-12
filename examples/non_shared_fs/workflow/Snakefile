@@ -2,10 +2,46 @@
 configfile: "workflow/config.yaml"
 
 
-rule local_to_non_shared_fs:
+# expand envvars in paths:
+submit_inputs = os.path.expandvars(config["submit_inputs"])
+submit_results = os.path.expandvars(config["submit_results"])
+
+
+# default_resources:
+# htcondor_transfer_input_files = os.path.expandvars(config["snakemake_env_tarball"])
+rule all:
+    default_target: True
+    input:
+        local_job_write_to_local=f"{config["local_results"]}/write_local_fs.done",
+        local_job_write_to_shared=f"{submit_results}/write_submitfs.done",
+        condor_job_write_to_shared=f"{submit_results}/write_condor_sharedfs.done",
+        condor_use_local_input_write_to_shared=f"{submit_results}/output.txt",
+        condor_use_local_input_write_to_local=f"{config['local_results']}/condor_use_local_input_write_to_local.txt",
+        condor_use_local_symlink_pointing_to_non_shared=f"{config['local_results']}/condor_use_local_symlink_pointing_to_non_shared.txt",
+        # rules.submit_write_access_shared_fs.output,
+        # rules.write_access_shared_fs.output,
+        # rules.test_path_parsing.output,
+        # rules.copy_inputs_to_sharedfs.output,
+        # rules.run_software.output,
+
+
+rule local_job_write_to_local:
     localrule: True
     output:
-        f"<results>/write_local_fs.done",
+        rules.all.input.local_job_write_to_local,
+    shell:
+        """
+        echo {output}
+        mkdir -p $(dirname {output})
+        touch {output}
+        echo "write to test" > {output}
+        """
+
+
+rule local_job_write_to_shared:
+    localrule: True
+    output:
+        rules.all.input.local_job_write_to_shared,
     shell:
         """
         echo "{output}"
@@ -15,7 +51,68 @@ rule local_to_non_shared_fs:
         """
 
 
-# rule local_to_shared_fs:
+rule condor_job_write_to_shared:
+    output:
+        f"{submit_results}/write_condor_sharedfs.done",
+    shell:
+        """
+        echo "{output}"
+        mkdir -p $(dirname {output})
+        touch {output}
+        echo "write to test" > {output}
+        """
+
+
+rule condor_use_local_input_write_to_shared:
+    input:
+        f"{config['local_inputs']}/input.txt",
+    output:
+        rules.all.input.condor_use_local_input_write_to_shared,
+    shell:
+        """
+        mkdir -p $(dirname {output})
+        cp {input} {output}
+        """
+
+
+rule condor_use_local_input_write_to_local:
+    input:
+        f"{config['local_inputs']}/input.txt",
+    output:
+        rules.all.input.condor_use_local_input_write_to_local,
+    shell:
+        """
+        mkdir -p $(dirname {output})
+        cp {input} {output}
+        """
+
+
+rule prepare_symlink:
+    localrule: True
+    input:
+        target=f"{config['local_inputs']}/input_symlink_target.txt",
+    output:
+        symlink=f"{config['local_inputs']}/input_symlink.txt",
+    shell:
+        """
+        echo "content" > {input.target}
+        ln -s input_symlink_target.txt {output.symlink}
+        """
+
+
+# symlinks are correctly treated
+rule condor_use_local_symlink_pointing_to_non_shared:
+    input:
+        rules.prepare_symlink.output.symlink,
+    output:
+        rules.all.input.condor_use_local_symlink_pointing_to_non_shared,
+    shell:
+        """
+        cat {input} > {output}        
+        """
+
+
+# rule local_job_write_to_shared_fs:
 #     localrule: True
 #     output:
 #         f'{config["PATH_SUBMIT_FS_OUTPUT"]}/write_submitfs.done',
@@ -26,8 +123,6 @@ rule local_to_non_shared_fs:
 #         touch {output}
 #         echo "write to test" > {output}
 #         """
-
-
 # rule submit_write_access_shared_fs:
 #     output:
 #         f'{config["PATH_SHARED_FS_OUTPUT"]}/write_sharedfs.done',
@@ -38,8 +133,6 @@ rule local_to_non_shared_fs:
 #         touch {output}
 #         echo "write to test" > {output}
 #         """
-
-
 # rule write_access_shared_fs:
 #     localrule: True
 #     output:
@@ -49,8 +142,6 @@ rule local_to_non_shared_fs:
 #         ls {config[PATH_SHARED_FS]} > /dev/null
 #         echo "read access test" >> {output}
 #         """
-
-
 # rule test_path_parsing:
 #     # showcase and test different ways to parse env variables in paths, see function at top of file
 #     # tests interaction with string templating, such as f-strings, which can be tricky
@@ -63,8 +154,6 @@ rule local_to_non_shared_fs:
 #         echo {config[PATH_SUBMIT_FS]} >> {output}
 #         echo /cephfs/user/${{USER}}/snakemake_tests >> {output}
 #         """
-
-
 # rule copy_inputs_to_sharedfs:
 #     localrule: True
 #     input:
@@ -76,8 +165,6 @@ rule local_to_non_shared_fs:
 #         mkdir -p {config[PATH_SHARED_FS_OUTPUT]}/inputs
 #         cp {input} {output}
 #         """
-
-
 # rule run_software:
 #     input:
 #         SOFT=rules.compile_software.output,

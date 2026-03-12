@@ -71,11 +71,13 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/f0/f0/df73f6abc9b5910e43612ae28c7b6f666af80c4edd46a216ef47599ab6cb/snakemake_interface_report_plugins-1.3.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/0e/d0/f4e9894c8aaf37efe3bf1afe15ee3cf0546d82b2713a589e266ee47bf2ef/snakemake_interface_scheduler_plugins-2.0.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/74/20/08a4f00c32329544ff147bafa68d0bab53645dca64dae218ff861bb4187d/snakemake_interface_storage_plugins-4.3.3-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/2b/53/7cf4d4d8091bb99cf91706c9ce659257b96867a77e472382f0de37be9cdb/snakemake_storage_plugin_xrootd-1.0.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/99/55/db07de81b5c630da5cbf5c7df646580ca26dfaefa593667fc6f2fe016d2e/tabulate-0.10.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/66/70/42d8796acc57c8bcd9ae395b1a6a0bbc833f738492a8ed192a44ccd58035/throttler-1.2.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/39/08/aaaad47bc4e9dc8c725e68f9d04865dbcb2052843ff09c97b08904852d84/urllib3-2.6.3-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/53/37/02af1867f5b1441aaeda9c82deed061b7cd1372572ddcd717f6df90b5e93/wrapt-2.1.2-cp314-cp314-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
+      - pypi: https://files.pythonhosted.org/packages/15/03/8ef34e9b735829230245b07ec6177b2fd0385d93ba5563e66af18517ceb9/xrootd-5.9.1.tar.gz
       - pypi: https://files.pythonhosted.org/packages/4d/63/6a44729fdc60eb255a7b156a84e7552290174a9bf151e3b6c18e83d6fbfa/yte-1.9.4-py3-none-any.whl
       - pypi: ./
       - pypi: ./src/snakemake
@@ -178,11 +180,9 @@ packages:
 - pypi: ./
   name: example-workflow
   version: 0.1.0
-  sha256: 6c720fd2c5e1786fe9508a39fe591beb232c67b0c8ae7e84d4370626f04c636d
+  sha256: 381134d784efa99961e7692b58f0e46dd9b0e292e07ebbcca7b6eb99ad0a58e6
   requires_dist:
-  - snakemake
-  - snakemake-interface-executor-plugins
-  - snakemake-executor-plugin-htcondor
+  - snakemake-storage-plugin-xrootd>=1.0.0,<2
   requires_python: '>=3.12'
 - pypi: https://files.pythonhosted.org/packages/cb/a8/20d0723294217e47de6d9e2e40fd4a9d2f7c4b6ef974babd482a59743694/fastjsonschema-2.21.2-py3-none-any.whl
   name: fastjsonschema
@@ -808,6 +808,15 @@ packages:
   - throttler>=1.2.2
   - wrapt>=1.15.0
   requires_python: '>=3.11'
+- pypi: https://files.pythonhosted.org/packages/2b/53/7cf4d4d8091bb99cf91706c9ce659257b96867a77e472382f0de37be9cdb/snakemake_storage_plugin_xrootd-1.0.0-py3-none-any.whl
+  name: snakemake-storage-plugin-xrootd
+  version: 1.0.0
+  sha256: 1d325613cd4fa52bd1277b1e09ca08a507cca689d4f40e4c8ef783607c0f3864
+  requires_dist:
+  - snakemake-interface-common>=1.15.0,<2
+  - snakemake-interface-storage-plugins>=4.1.0,<5
+  - xrootd>=5.6,<6
+  requires_python: '>=3.11'
 - pypi: https://files.pythonhosted.org/packages/99/55/db07de81b5c630da5cbf5c7df646580ca26dfaefa593667fc6f2fe016d2e/tabulate-0.10.0-py3-none-any.whl
   name: tabulate
   version: 0.10.0
@@ -883,6 +892,10 @@ packages:
   - pytest ; extra == 'dev'
   - setuptools ; extra == 'dev'
   requires_python: '>=3.9'
+- pypi: https://files.pythonhosted.org/packages/15/03/8ef34e9b735829230245b07ec6177b2fd0385d93ba5563e66af18517ceb9/xrootd-5.9.1.tar.gz
+  name: xrootd
+  version: 5.9.1
+  sha256: 99ded4a168ce4b435cb9f7683acbe414c49ebc6486266ed9099a7c448ddc5b13
 - pypi: https://files.pythonhosted.org/packages/4d/63/6a44729fdc60eb255a7b156a84e7552290174a9bf151e3b6c18e83d6fbfa/yte-1.9.4-py3-none-any.whl
   name: yte
   version: 1.9.4

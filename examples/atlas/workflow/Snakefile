@@ -1,0 +1,24 @@
+# Load config file
+configfile: "workflow/config.yaml"
+
+
+# expand envvars in paths:
+submit_inputs = os.path.expandvars(config["submit_inputs"])
+submit_results = os.path.expandvars(config["submit_results"])
+
+
+rule filter_str:
+    input:
+        storage.xrootd(config["input_data"]),
+    output:
+        "ntuple0_str_output.root",
+    log:
+        "logs/filter/filter_str.log",
+    params:
+        input_tree_name="TestTree",
+        output_tree_name="TestTree",
+        criteria="(pt > 1400) && (pz > 19000)",
+        branches_to_save=["pz", "pt", "p"],
+    threads: 2
+    wrapper:
+        "v9.3.0/phys/root/filter"
