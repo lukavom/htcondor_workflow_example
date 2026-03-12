@@ -22,3 +22,22 @@ rule filter_str:
     threads: 2
     wrapper:
         "v9.3.0/phys/root/filter"
+
+rule add_branches:
+    input:
+        "ntuple0_str_output.root",
+    output:
+        "ntuple1_add_branches_output.root",
+    log:
+        "logs/add_branches/add_branches.log",
+    params:
+        input_tree_name="TestTree",
+        output_tree_name="TestTree",
+        branches_to_add={"eta": "TMath::ATanH(pz/pt)"},
+    threads: 2
+    wrapper:
+        "v9.3.0/phys/root/add_branches"
+
+
+rule plot_histogram:
+
